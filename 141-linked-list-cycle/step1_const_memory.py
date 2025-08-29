@@ -7,24 +7,22 @@ class ListNode:
 
 class Solution:
     def hasCycle(self, head: ListNode | None) -> bool:
-        # 空の連結リスト、または単ノードからなる連結リストは明らかにサイクルを持たない
         if head is None or head.next is None:
             return False
+
+        def get_node_two_ahead(node: ListNode) -> ListNode | None:
+            if node.next is None:
+                return None
+            return node.next.next
 
         fast_pointer = head
         slow_pointer = head
 
         while True:
-            fast_pointer = self._get_nexnex_node(fast_pointer)
+            fast_pointer = get_node_two_ahead(fast_pointer)
             slow_pointer = slow_pointer.next
 
             if fast_pointer is None:
                 return False
             if fast_pointer is slow_pointer:
                 return True
-
-    def _get_nexnex_node(self, node: ListNode) -> ListNode | None:
-        next_node = node.next
-        if next_node is None:
-            return None
-        return next_node.next

@@ -12,7 +12,9 @@ class Solution:
 
         while cur_node is not None:
             if cur_node in checked_nodes:
+                # 一度見たノードにもう一度訪れたならサイクルがある
                 return True
+
             checked_nodes.add(cur_node)
             cur_node = cur_node.next
 
