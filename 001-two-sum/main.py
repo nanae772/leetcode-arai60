@@ -7,7 +7,7 @@ class Solution:
                 if nums[i] + nums[j] == target:
                     return [i, j]
 
-        assert False
+        raise AssertionError()
 
 
 def test_two_sum():
