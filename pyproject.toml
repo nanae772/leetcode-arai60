@@ -8,3 +8,13 @@ dependencies = [
     "pytest>=8.4.1",
     "ruff>=0.12.11",
 ]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "W", "UP"]
+ignore = [
+  "E501", # line-too-long
+]
+unfixable = [
+  "F401", # unused-import
+  "F841", # unused-variable
+]
