@@ -7,15 +7,15 @@ class ListNode:
 
 class Solution:
     def hasCycle(self, head: ListNode | None) -> bool:
-        checked_nodes = set()
-        cur_node = head
+        visited = set()
+        node = head
 
-        while cur_node is not None:
-            if cur_node in checked_nodes:
+        while node is not None:
+            if node in visited:
                 # 一度見たノードにもう一度訪れたならサイクルがある
                 return True
 
-            checked_nodes.add(cur_node)
-            cur_node = cur_node.next
+            visited.add(node)
+            node = node.next
 
         return False
