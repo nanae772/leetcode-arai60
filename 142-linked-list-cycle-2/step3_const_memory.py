@@ -19,8 +19,7 @@ class Solution:
         if head is None or head.next is None:
             return None
 
-        fast_pointer = head
-        slow_pointer = head
+        fast_pointer, slow_pointer = head, head
         has_cycle = False
 
         while fast_pointer is not None and fast_pointer.next is not None:
