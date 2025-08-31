@@ -21,20 +21,22 @@ class Solution:
 
         fast_pointer = head
         slow_pointer = head
+        has_cycle = False
 
         while fast_pointer is not None and fast_pointer.next is not None:
             fast_pointer = fast_pointer.next.next
             slow_pointer = slow_pointer.next
 
             if fast_pointer is slow_pointer:
-                # サイクルが検知されたのでサイクルの始点を見つける
-                slow_pointer = head
+                has_cycle = True
+                break
 
-                while fast_pointer is not slow_pointer:
-                    fast_pointer = fast_pointer.next
-                    slow_pointer = slow_pointer.next
-
-                return fast_pointer
-
-        # fast_pointerが連結リストの末尾にたどり着けるならサイクル無し
-        return None
+        if has_cycle:
+            # サイクルの始点を探す
+            slow_pointer = head
+            while fast_pointer is not slow_pointer:
+                fast_pointer = fast_pointer.next
+                slow_pointer = slow_pointer.next
+            return fast_pointer
+        else:
+            return None
