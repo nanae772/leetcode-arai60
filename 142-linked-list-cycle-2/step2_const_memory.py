@@ -18,18 +18,20 @@ class Solution:
             slow_pointer = slow_pointer.next
 
             if fast_pointer is slow_pointer:
-                return self._find_cycle_start(head, fast_pointer, slow_pointer)
+                return self._find_cycle_start(head, fast_pointer)
 
         return None
 
     def _find_cycle_start(
-        self, head: ListNode, fast_pointer: ListNode, slow_pointer: ListNode
+        self,
+        head: ListNode,
+        meeting_node: ListNode,
     ) -> ListNode:
-        assert head is not None
-        slow_pointer = head
+        node_from_head = head
+        node_from_meet = meeting_node
 
-        while fast_pointer is not slow_pointer:
-            fast_pointer = fast_pointer.next
-            slow_pointer = slow_pointer.next
+        while node_from_head is not node_from_meet:
+            node_from_head = node_from_head.next
+            node_from_meet = node_from_meet.next
 
-        return fast_pointer
+        return node_from_head
