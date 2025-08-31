@@ -7,6 +7,8 @@ class ListNode:
 
 class Solution:
     def deleteDuplicates(self, head: ListNode | None) -> ListNode | None:
+        # 元のリストを変えずに重複を排除したリストを作成するコードを書いたつもりだったが
+        # 元のリストを書き換えるコードになってしまっている
         if head is None:
             return None
 
