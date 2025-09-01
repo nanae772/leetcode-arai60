@@ -11,16 +11,16 @@ class Solution:
         if head is None:
             return None
 
-        node = ListNode(head.val, None)
-        head_uniq_list = node
+        node_unique = ListNode(head.val, None)
+        head_unique = node_unique
         node_original = head
 
         while True:
-            while node_original is not None and node_original.val == node.val:
+            while node_original is not None and node_original.val == node_unique.val:
                 node_original = node_original.next
             if node_original is None:
                 break
-            node.next = ListNode(node_original.val, None)
-            node = node.next
+            node_unique.next = ListNode(node_original.val, None)
+            node_unique = node_unique.next
 
-        return head_uniq_list
+        return head_unique
