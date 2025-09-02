@@ -19,10 +19,10 @@ class Solution:
             while node.next is not None and node.next.val == node.val:
                 node = node.next
             if last_kept_node.next is node:
-                # 重複によるスキップが発生した場合
+                # 重複によるスキップが発生しなかった場合
                 last_kept_node = node
             else:
-                # 重複によるスキップが発生しなかった場合
+                # 重複によるスキップが発生した場合
                 last_kept_node.next = node.next
             node = node.next
 
