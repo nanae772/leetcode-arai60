@@ -103,3 +103,51 @@ GPTに相談してみたがuniqueは微妙そう。初期値がダミーでは�
 ダミーノードの導入だったり重複があったときに異なる値の一個前のノードで止めてやるようにするなどの改善により、
 最初に比べるとだいぶすっきりとしたコードになりすらすらと書けるようになった。
 ロジックも分かりやすい気がする。
+
+# ステップ５
+
+レビュー後にいただいたコメントを元に復習。
+
+## node, dummy だけの実装
+
+まず、「last_kept_nodeは使わずにdummyとnodeだけで（かつdummyは動かさずに）実装できるか」について。
+考えても分からなかったのでコメントをいただいた方の実装を参考にさせていただいた。
+
+https://github.com/akmhmgc/arai60/commit/2985ca0c671607ecbb674dafca30d3b4fca68037
+
+今見ているノード(node)は「既に確定しているノードを指している」というのがポイントで、dummyから始める。
+１個先、２個先を比較して異なっていたら１個先は確定させてよいので単にnodeを一個進める。
+そうでなければ重複があるノードなので可能な限り飛ばしていってnode.nextを異なる値になるノードにつなぎ変える。
+dummyは動かしてないので最後はdummy.nextを返せばよい。
+
+という感じだった。コードを読んだだけではすんなり理解できなかったので紙に書いてシミュレートしたりして理解できた。
+
+書いてみて
+`node is not None and node.next is not None and node.next.next is not None`
+という条件が流石にくどすぎるなという気がした。
+
+Googleのスタイルガイドは
+> Always use if foo is None: (or is not None) to check for a None value. 
+https://google.github.io/styleguide/pyguide.html#2144-decision
+
+であるし、自分も可能な限りそうすることに賛成している。前の問題でもそう言った。
+https://github.com/nanae772/leetcode-arai60/pull/4/files#diff-bc26adce864df1eaf570b905014840f1b32806ec4d15b04e6dd68497a5efa7d4R95-R100
+
+けどここはあえて`node and node.next and node.next.next`にしてみようかと思う。
+練習なのでいろんな書き方を試してみるのも良いだろうし、長くなりすぎないというメリットも確かにある。
+nodeはListNode|None型なのでNone以外の変なfalthyの値が入らないという言い訳も一応ある。
+
+## dummyを使わない実装
+
+もう一つは私が最初に実装していたdummyを使わない実装について、odaさんのコメントより
+条件分岐などを整理してもう少しシンプルに書けるのではないかということで再度実装してみる。
+
+少し苦戦したが何とか実装できた
+
+1. まず値が１つしかない場合の処理のほうを先にした。簡単な方を先にする。
+2. continueを用いてelseを使わないことで、インデントを下げて読みやすくする。
+3. 読み飛ばしを行った後に`node_without_duplicates.next = node`と繋ぎかえておく。
+  1. そうすることでループの外で無理やりつじつまを合わせなくてよくなった。
+
+dummyを使わない関係上やはり条件分岐は多くなるが、それでも最初に書いたstep2.pyより
+見通しはだいぶ良くなった…気がする。
