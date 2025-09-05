@@ -16,16 +16,15 @@ class Solution:
             if not node.next or node.val != node.next.val:
                 if not head_without_duplicates:
                     head_without_duplicates = node
-                    node_without_duplicates = node
                 else:
-                    node_without_duplicates = node_without_duplicates.next
+                    node_without_duplicates.next = node
+                node_without_duplicates = node
                 node = node.next
+                node_without_duplicates.next = None
                 continue
 
             duplicated_val = node.val
             while node and node.val == duplicated_val:
                 node = node.next
-            if node_without_duplicates:
-                node_without_duplicates.next = node
 
         return head_without_duplicates
