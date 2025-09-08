@@ -1,4 +1,5 @@
 {
     "python.languageServer": "None",
-    "ruff.lint.enable": false
+    "ruff.lint.enable": false,
+    "editor.wordBasedSuggestions": "currentDocument"
 }
