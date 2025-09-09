@@ -134,3 +134,129 @@ Dutch national flagもやろうと思っていたが疲れてしまったので�
 
 ３回連続で通せるようになったので一旦完了。
 most_commonは封印して解いたほうがよかったかもしれない…
+
+# ステップ４
+
+昨日はクイックセレクトを考えるときに、まだちゃんと理解できてない状態で
+この問題に合わせて昇順ではなく降順でやろうとしてたのも混乱のもとだったかもしれない。
+今回は一般的な昇順ソートで改めて理解しなおす。
+
+まずLomuto's Partitionのアルゴリズムを要点だけ抽出して書くと以下になる。
+
+```python
+def lomutos_partition(a: list, left: int, right: int, index_pivot: int) -> int:
+    # 区間[left, right]を分割して左側をpivotの値以下、右側をpivotの値より大きくする
+    pivot = a[index_pivot]
+    # まずpivotをrightの位置と入れ替える
+    a[index_pivot], a[right] = a[right], a[index_pivot]
+    leftmost_greater_than_pivot = left
+    for i in range(left, right):
+        if a[i] <= pivot:
+            a[i], a[leftmost_greater_than_pivot] = a[leftmost_greater_than_pivot], a[i]
+            leftmost_greater_than_pivot += 1
+    a[leftmost_greater_than_pivot], a[right] = a[right], a[leftmost_greater_than_pivot]
+    rightmost_at_most_pivot = leftmost_greater_than_pivot
+    return rightmost_at_most_pivot
+```
+
+このとき返り値の範囲は left <= rightmost_at_most_pivot <= right になる。
+そしてこのアルゴリズムが終わった後、
+a[left:rightmost_at_most_pivot]の全ての要素はpivot以下
+a[rightmost_at_most_pivot]はpivot自身、
+a[rightmost_at_most_pivot:right + 1]の全ての要素はpivotより大きくなる。
+ざっくり書くと
+a[left:rightmost_at_most_pivot] <= a[rightmost_at_most_pivot] <= a[rightmost_at_most_pivot:right + 1]
+となるように分けられる。
+
+なのでLomuto's Partitionの場合は以下のように
+[left, rightmost_at_most_pivot - 1],
+[rightmost_at_most_pivot + 1, right]
+いずれの区間に再帰させても区間が１つは狭まっていくので無限再帰になることは無いし、
+また上記の不等式からrightmost_at_most_pivotを削っても最終的に正しい答えを求められていた。
+
+一方でHoare's Partitionの場合
+
+```python
+def hoares_partition(a: list, left: int, right: int, index_pivot: int) -> int:
+    # 区間[left, right]を分割して左側をpivotの値以下、右側をpivotの値以上にする
+    pivot = a[index_pivot]
+    leftmost_at_least_pivot = left - 1
+    rightmost_at_most_pivot = right + 1
+
+    while True:
+        leftmost_at_least_pivot += 1
+        while a[leftmost_at_least_pivot] < pivot:
+            leftmost_at_least_pivot += 1
+
+        rightmost_at_most_pivot -= 1
+        while a[rightmost_at_most_pivot] > pivot:
+            rightmost_at_most_pivot -= 1
+
+        if leftmost_at_least_pivot >= rightmost_at_most_pivot:
+            return rightmost_at_most_pivot
+
+        a[leftmost_at_least_pivot], a[rightmost_at_most_pivot] = (
+            a[rightmost_at_most_pivot], a[leftmost_at_least_pivot]
+        )
+```
+
+こちらも返り値の範囲は left <= rightmost_at_most_pivot <= right になる。
+そしてこのアルゴリズムでは最終的にrightmost_at_most_pivotの位置にpivotが来る保証がないため、
+a[left:rightmost_at_most_pivot + 1] <= a[rightmost_at_most_pivot + 1:right + 1]
+であることしか満たされない。その状態で左側に再帰して
+[left, rightmost_at_most_pivot - 1]
+としてしまうとa[rightmost_at_most_pivot]がa[left:rightmost_at_most_pivot]内のある要素より小さい場合があったときに、
+正しく答えを求められないという状態が起きる。
+
+昨日の私はこれを避けようとして、左側に再帰するときに
+[left, rightmost_at_most_pivot]
+としたが、これはこれでrightmost_at_most_pivot = rightとなるケースがあり、この場合は区間を狭められていないので
+そういったケースで無限再帰になってしまう。
+これに関してはLomutoの場合も同様で、むしろLomutoの場合は全てが同じ値のときにランダムにpivotを取っても必ず
+rightmost_at_most_pivot = rightになるので分かりやすく昨日発覚したのもそれだった。
+
+
+## どうすればよかったのか
+
+Lomuto, Hoareでそれぞれ厳密には違う分け方をしているので別々に実装すべきだったかもしれない。
+
+まずLomutoについては上述のようにrightmost_at_most_pivotを取り除いて
+[left, rightmost_at_most_pivot - 1],
+[rightmost_at_most_pivot + 1, right]
+のどちらかに再帰させる方法で確実に狭まっていくので問題はない(全て同じ値のときにO(N^2)になる問題は依然としてあるが)
+
+Hoareの場合。
+rightmost_at_most_pivot = rightがどのようなケースかを考えてみると
+
+最初のループで
+
+1. rightmost_at_most_pivotがrightで止まる
+2. leftmost_at_least_pivotがrightで止まる
+3. leftmost_at_least_pivot >= rightmost_at_most_pivotなので、rightが返る
+
+というケースしかないはず（次のループに行くとrightmost_at_most_pivot < rightになるため）
+
+そしてこの状況がどういうことかというと
+
+1. 1.よりa[right] <= pivot
+2. 2.よりa[left:right-1]は全てpivotより小さく、a[right] >= pivot
+3. よってa[left:right-1] < a[right] = pivot
+
+ということになる。つまりpivotを選ぶときに右端から選び、そのほかが全てpivotより小さいときに区間が狭まらない。
+
+この対策としては
+
+1. Hoare's partitionでは右端をpivotに選ばないようにする
+2. rightmost_at_most_pivot = rightとなった場合は、rightmost_at_most_pivotがピボットになっているため、
+      左側に再帰するときにそこを削って[left, rightmost_at_most_pivot - 1]にする例外処理を行う
+
+の２つが考えられる、シンプルなのは1だろうか。
+
+改めて整理し直して、
+
+1. Lomuto's partition(step4-lomuto.py)
+2. Hoare's partition(step4-hoare.py)
+3. Dutch natinal flag partition(step4-dnf.py)
+
+の３パターンによる分割を実装した。
+Dutch natinaol flagも出てくる変数は多いもののそこまで複雑なアルゴリズムではなかったため理解できた。
