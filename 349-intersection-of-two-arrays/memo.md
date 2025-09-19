@@ -128,3 +128,31 @@ setに変換する方法で、小さい方だけを持てば空間計算量をO(
 
 setのほうは一行なのであまり練習にならないと思い、ソートする方でやった。
 3回連続で通せるようになったので一旦完了。
+
+# ステップ４
+
+勉強のためにSeperate Chaining方式で最小限のHashSetクラスを自前で実装してみた。
+ちゃんとやるならhash関数も自前でやるべきだと思うが浮動小数点数や文字列、タプルなどいろんな型に対応しようとすると
+結構大変そうだなと思ったので組込みのhashを使った。
+https://docs.python.org/ja/3.13/library/functions.html#hash
+
+ただこの問題では整数値しか入ってこないのでこの問題を解くためだけの最小限の機能を実装するなら、
+単にその整数をcapacityで割った余りを取るくらいで十分だったかもしれない。
+https://en.wikipedia.org/wiki/Hash_table#Hashing_by_division
+
+CPythonのnumeric type(int, float, Decimal, Fraction)のhash化については以下に記載がある。
+https://docs.python.org/3/library/stdtypes.html#hashing-of-numeric-types
+
+> If x = m / n is a nonnegative rational number and n is not divisible by P,
+> define hash(x) as m * invmod(n, P) % P, where invmod(n, P) gives the inverse of n modulo P.
+
+今回のケースのように正の整数しかhashに入ってこない場合は上記においてn = 1の場合になり、
+invmod(n, P) = 1となるので、
+x = m / 1 = m,
+hash(x) = m * invmod(1, P) % P = x % P
+となっている。特に、x < Pのとき
+hash(x) = x
+が成り立つ。
+
+なので今回の問題の条件(0 <= nums[i] <= 1000)においてはhash(x) = xであり、
+今回のハッシュ化は「単にその整数をcapacityで割った余りを取る」と同じになっていた。
