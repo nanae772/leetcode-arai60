@@ -1,5 +1,6 @@
 {
     "python.languageServer": "None",
     "ruff.lint.enable": false,
-    "editor.wordBasedSuggestions": "currentDocument"
+    "editor.wordBasedSuggestions": "currentDocument",
+    "terminal.integrated.stickyScroll.enabled": false
 }
